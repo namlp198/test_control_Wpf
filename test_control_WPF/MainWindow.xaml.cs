@@ -24,19 +24,32 @@ namespace test_control_WPF
         {
             InitializeComponent();
 
-            var btn1 = toolBar.AddButton("INITIALIZE", 120, "Khởi tạo lại hệ thống");
+            try
+            {
+                LogViewer.AddInfo("Application started", "MainWindow");
 
-            toolBar.AddArrowSeparator();
+                var btn1 = toolBar.AddButton("INITIALIZE", 120, "Khởi tạo lại hệ thống");
 
-            var btn2 = toolBar.AddToggleButton("MANUAL", 120, "Vận hành");
+                toolBar.AddArrowSeparator();
+                LogViewer.AddInfo("Added INITIALIZE button", "MainWindow");
 
-            toolBar.AddArrowSeparator();
+                var btn2 = toolBar.AddToggleButton("MANUAL", 120, "Vận hành");
 
-            var btn3 = toolBar.AddButton("MODEL", 120, "Chọn recipe");
+                toolBar.AddArrowSeparator();
+                LogViewer.AddInfo("Added TOGGLE button", "MainWindow");
 
-            toolBar.AddArrowSeparator();
+                var btn3 = toolBar.AddButton("MODEL", 120, "Chọn recipe");
 
-            var combo = toolBar.AddComboBox(120);
+                toolBar.AddArrowSeparator();
+                LogViewer.AddInfo("Added MODEL button", "MainWindow");
+
+                var combo = toolBar.AddComboBox(120);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
         }
     }
 }

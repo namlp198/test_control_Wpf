@@ -13,5 +13,17 @@ namespace test_control_WPF
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            // Handle unhandled exceptions
+            this.DispatcherUnhandledException += (sender, args) =>
+            {
+                MessageBox.Show($"Unhandled exception: {args.Exception.Message}",
+                               "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                args.Handled = true;
+            };
+
+            base.OnStartup(e);
+        }
     }
 }

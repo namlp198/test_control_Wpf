@@ -11,9 +11,23 @@
             <RowDefinition Height="auto"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <local:ProfessionalToolbar Height="100"
-                                   x:Name="toolBar">
-            
-        </local:ProfessionalToolbar>
+        <Grid>
+            <local:ProfessionalToolbar Height="100"
+                                       x:Name="toolBar">
+
+            </local:ProfessionalToolbar>
+        </Grid>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Main">
+            </TabItem>
+            <TabItem Header="Log">
+                <!-- Log Viewer Control -->
+                <local:LogViewerControl Grid.Row="1"
+                                      x:Name="LogViewer"
+                                      MaxLogEntries="500"
+                                      AutoScroll="True"
+                                      Margin="10" />
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
