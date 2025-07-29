@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace test_control_WPF
         public MainWindow()
         {
             InitializeComponent();
+            UpdateUI();
 
             try
             {
@@ -50,6 +52,61 @@ namespace test_control_WPF
             {
                 MessageBox.Show($"Error: {ex.Message}");
             }
+
+            DataContext = this;
+        }
+
+        private void YawSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            GyroView.Yaw = e.NewValue;
+            YawText.Text = ((int)e.NewValue).ToString();
+        }
+
+        private void PitchSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            GyroView.Pitch = e.NewValue;
+            PitchText.Text = ((int)e.NewValue).ToString();
+        }
+
+        private void RollSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            GyroView.Roll = e.NewValue;
+            RollText.Text = ((int)e.NewValue).ToString();
+        }
+
+        private void UpdateUI()
+        {
+            YawSlider.Value = GyroView.Yaw;
+            PitchSlider.Value = GyroView.Pitch;
+            RollSlider.Value = GyroView.Roll;
+        }
+
+        private void Joystick_ValueChanged(object sender, JoystickEventArgs e)
+        {
+            ValueDisplay.Text = $"X: {e.XValue}, Y: {e.YValue}";
+
+            // Gửi giá trị đến robot ở đây
+            // Ví dụ: SendToRobot(e.XValue, e.YValue);
+        }
+
+        private void Joystick_DirectionChanged(object sender, DirectionChangedEventArgs e)
+        {
+            DirectionDisplay.Text = $"Direction: {e.NewDirection}";
+        }
+    }
+
+    public class IntConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string str && int.TryParse(str, out int result))
+                return result;
+            return 0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value?.ToString();
         }
     }
 }
