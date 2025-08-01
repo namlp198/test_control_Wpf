@@ -8,6 +8,7 @@
         Title="MainWindow" Height="600" Width="1000">
     <Window.Resources>
         <local:IntConverter x:Key="IntConverter" />
+        <local:MathConverter x:Key="MathConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -104,7 +105,7 @@
                                    Margin="20,0,5,0" />
                         <TextBox Name="DeadZoneBox"
                                  Width="50"
-                                 Text="40"
+                                 Text="45"
                                  VerticalAlignment="Center" />
                     </StackPanel>
 
@@ -148,6 +149,89 @@
                                        FontStyle="Italic" />
                         </StatusBarItem>
                     </StatusBar>
+                </Grid>
+            </TabItem>
+            <TabItem Header="TriStateToggle">
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Margin="20"
+                            Orientation="Horizontal">
+                    <local:TriStateToggle x:Name="triStateToggle"
+                                          StateChanged="triStateToggle_StateChanged"
+                                          State1Text="OFF"
+                                          State2Text="ON1"
+                                          State3Text="ON2" 
+                                          Width="300"/>
+
+                    <StackPanel Margin="0,20,0,0">
+                        <TextBlock Text="Tuỳ chỉnh tên trạng thái:"
+                                   Margin="0,0,0,5" />
+                        <TextBox x:Name="State1TextBox"
+                                 Text="TẮT"
+                                 Margin="0,0,0,5" />
+                        <TextBox x:Name="State2TextBox"
+                                 Text="MỨC 1"
+                                 Margin="0,0,0,5" />
+                        <TextBox x:Name="State3TextBox"
+                                 Text="MỨC 2"
+                                 Margin="0,0,0,10" />
+                        <Button Content="Cập nhật"
+                                />
+                    </StackPanel>
+
+                    <TextBlock x:Name="StatusText"
+                               Margin="0,20,0,0"
+                               HorizontalAlignment="Center"
+                               FontSize="16"
+                               FontWeight="Bold" />
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="TriStateToggleBasic">
+                <Grid>
+                    <local:TriStateToggleBasic HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          OffLabel="Tắt"
+                                          NeutralLabel="Chờ"
+                                          OnLabel="Bật"
+                                               Height="50"
+                                               Width="250" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="TripleToggleSwitch">
+                <Grid>
+                    <local:TripleToggleSwitch State0Text="OFF"
+                                              State1Text="ON1"
+                                              State2Text="ON2"
+                                              Height="300"
+                                              Width="100"
+                                              FontWeight="Bold"
+                                              FontSize="20"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              ValueChanged="TripleToggleSwitch_ValueChanged">
+                        <local:TripleToggleSwitch.SideImage>
+                            <Image Source="/assets/LIGHT_ON.png" 
+                                   Width="64"
+                                   Height="64"/>
+                        </local:TripleToggleSwitch.SideImage>
+                    </local:TripleToggleSwitch>
+                    <local:TripleToggleSwitch State0Text="OFF"
+                                              State1Text="ON1"
+                                              State2Text="ON2"
+                                              Margin="300 0 0 0"
+                                              Height="300"
+                                              Width="100"
+                                              FontWeight="Bold"
+                                              FontSize="20"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              ValueChanged="TripleToggleSwitch_ValueChanged">
+                        <local:TripleToggleSwitch.SideImage>
+                            <Image Source="/assets/SIREN_ON.png"
+                                   Width="64"
+                                   Height="64" />
+                        </local:TripleToggleSwitch.SideImage>
+                    </local:TripleToggleSwitch>
                 </Grid>
             </TabItem>
             <TabItem Header="Log">

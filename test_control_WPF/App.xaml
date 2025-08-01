@@ -4,6 +4,103 @@
              xmlns:local="clr-namespace:test_control_WPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!-- Converter for calculating positions -->
+        <local:HalfWidthConverter x:Key="HalfWidthConverter" />
+        <local:ValueToTextConverter x:Key="ValueToTextConverter" />
+
+        <ControlTemplate x:Key="ThumbTemplate"
+                         TargetType="{x:Type Thumb}">
+            <Border Background="#AAFFFFFF"
+                    CornerRadius="8"
+                    BorderBrush="#FF000000"
+                    BorderThickness="1">
+                <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType={x:Type local:TripleToggleSwitch}}, 
+                   Converter={StaticResource ValueToTextConverter}}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontWeight="Bold" />
+            </Border>
+        </ControlTemplate>
+
+        <Style TargetType="{x:Type local:TripleToggleSwitch}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type local:TripleToggleSwitch}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="80" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Side Image -->
+                            <ContentPresenter Grid.Row="0"
+                                              Content="{TemplateBinding SideImage}"
+                                              Margin="0,0,0,5"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center" />
+
+                            <!-- Vertical Toggle Switch -->
+                            <Border Grid.Row="1"
+                                    MinWidth="100"
+                                    CornerRadius="8"
+                                    Background="#FFE0E0E0"
+                                    x:Name="PART_Track">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Status -->
+                                    <TextBlock Grid.Row="0"
+                                               Text="{TemplateBinding State2Text}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="1"
+                                               Text="{TemplateBinding State1Text}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="2"
+                                               Text="{TemplateBinding State0Text}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+
+                                    <Canvas Grid.RowSpan="3"
+                                            Background="Transparent">
+                                        <Thumb x:Name="PART_Thumb"
+                                               Template="{StaticResource ThumbTemplate}"
+                                               Panel.ZIndex="1" />
+                                    </Canvas>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Value"
+                                     Value="0">
+                                <Setter TargetName="PART_Track"
+                                        Property="Background"
+                                        Value="#FFF44336" />
+                            </Trigger>
+                            <Trigger Property="Value"
+                                     Value="1">
+                                <Setter TargetName="PART_Track"
+                                        Property="Background"
+                                        Value="#FF2196F3" />
+                            </Trigger>
+                            <Trigger Property="Value"
+                                     Value="2">
+                                <Setter TargetName="PART_Track"
+                                        Property="Background"
+                                        Value="#FF4CAF50" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

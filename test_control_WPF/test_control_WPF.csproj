@@ -55,10 +55,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="HalfWidthConverter.cs" />
     <Compile Include="JoystickControl.xaml.cs">
       <DependentUpon>JoystickControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="RobotExtrudedMeshFactory.cs" />
+    <Compile Include="TripleToggleSwitch.cs" />
+    <Compile Include="TriStateToggle.xaml.cs">
+      <DependentUpon>TriStateToggle.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TriStateToggleBasic.xaml.cs">
+      <DependentUpon>TriStateToggleBasic.xaml</DependentUpon>
+    </Compile>
     <Page Include="Gyro3DControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -90,6 +98,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="ProfessionalToolbar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TriStateToggle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TriStateToggleBasic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -125,6 +141,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="assets\robot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="assets\LIGHT_ON.png" />
+    <Resource Include="assets\SIREN_ON.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

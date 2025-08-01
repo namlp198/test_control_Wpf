@@ -53,6 +53,7 @@ namespace test_control_WPF
                 MessageBox.Show($"Error: {ex.Message}");
             }
 
+           
             DataContext = this;
         }
 
@@ -92,6 +93,32 @@ namespace test_control_WPF
         private void Joystick_DirectionChanged(object sender, DirectionChangedEventArgs e)
         {
             DirectionDisplay.Text = $"Direction: {e.NewDirection}";
+        }
+
+        private void TripleToggleSwitch_ValueChanged(object sender, RoutedPropertyChangedEventArgs<int> e)
+        {
+            var control = (TripleToggleSwitch)sender;
+            int newValue = e.NewValue;
+            int oldValue = e.OldValue;
+
+            // Xử lý khi giá trị thay đổi
+            switch (newValue)
+            {
+                case 0:
+                    Console.WriteLine("OFF State");
+                    break;
+                case 1:
+                    Console.WriteLine("ON1 State");
+                    break;
+                case 2:
+                    Console.WriteLine("ON2 State");
+                    break;
+            }
+        }
+
+        private void triStateToggle_StateChanged(object sender, StateChangedEventArgs e)
+        {
+
         }
     }
 

@@ -29,7 +29,7 @@
                     Value="20" />
         </Style>
 
-        <!-- Style cho đường kẻ căn chỉnh -->
+        <!-- Style align line -->
         <Style x:Key="GuidelineStyle"
                TargetType="Line">
             <Setter Property="Stroke"
@@ -44,12 +44,12 @@
     </UserControl.Resources>
 
     <Grid>
-        <!-- Outer Circle với các hướng vẽ trực tiếp lên bề mặt -->
+        <!-- Outer Circle -->
         <Grid>
-            <!-- Nền tròn -->
+            <!-- Circle Background -->
             <Ellipse Name="OuterCircle"
                      Margin="10"
-                     Fill="#F5F5F5"
+                     Fill="#4CFFA300"
                      Stroke="#444"
                      StrokeThickness="2">
                 <Ellipse.Effect>
@@ -59,32 +59,36 @@
                 </Ellipse.Effect>
             </Ellipse>
 
-            <!-- Các hướng chính -->
+            <!-- Main Directions -->
             <Path Name="UpIndicator"
                   Style="{StaticResource DirectionIndicator}"
                   Data="M 0,10 L 10,0 20,10 Z"
                   VerticalAlignment="Top"
-                  HorizontalAlignment="Center" />
+                  HorizontalAlignment="Center" 
+                  Margin="0 -2 0 0"/>
 
             <Path Name="DownIndicator"
                   Style="{StaticResource DirectionIndicator}"
                   Data="M 0,0 L 10,10 20,0 Z"
                   VerticalAlignment="Bottom"
-                  HorizontalAlignment="Center" />
+                  HorizontalAlignment="Center"
+                  Margin="0 0 0 -2" />
 
             <Path Name="LeftIndicator"
                   Style="{StaticResource DirectionIndicator}"
                   Data="M 10,0 L 0,10 10,20 Z"
                   VerticalAlignment="Center"
-                  HorizontalAlignment="Left" />
+                  HorizontalAlignment="Left"
+                  Margin="-2 0 0 0" />
 
             <Path Name="RightIndicator"
                   Style="{StaticResource DirectionIndicator}"
                   Data="M 0,0 L 10,10 0,20 Z"
                   VerticalAlignment="Center"
-                  HorizontalAlignment="Right" />
+                  HorizontalAlignment="Right"
+                  Margin="0 0 -2 0" />
 
-            <!-- Các hướng chéo -->
+            <!-- Diagonal Direction -->
             
             <!-- UpLeft -->
             <Path Name="UpLeftIndicator"
@@ -147,8 +151,7 @@
             </Path>
         </Grid>
 
-        <!-- Thêm vào Grid, sau OuterCircle nhưng trước InnerCircle -->
-        <Ellipse Width="6"
+        <!--<Ellipse Width="6"
                  Height="6"
                  Fill="#4CAF50"
                  Opacity="0.5"
@@ -175,9 +178,9 @@
                  Opacity="0.5"
                  HorizontalAlignment="Right"
                  VerticalAlignment="Center"
-                 Margin="0,0,10,0" />
+                 Margin="0,0,10,0" />-->
 
-        <!-- Các đường kẻ căn chỉnh (nằm dưới các indicator) -->
+        <!-- Align line (Under the indicators) -->
         <Line Name="HorizontalGuideline"
               Style="{StaticResource GuidelineStyle}"
               X1="0"
@@ -198,7 +201,18 @@
               VerticalAlignment="Stretch"
               HorizontalAlignment="Center" />
 
-        <!-- Joystick handle với hiệu ứng nổi -->
+        <!-- DeadZone Circle -->
+        <Ellipse x:Name="DeadZoneCircle"
+                 Stroke="Gray"
+                 StrokeThickness="1"
+                 StrokeDashArray="2"
+                 Fill="#30AAAAAA"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 IsHitTestVisible="False"
+                 Visibility="Visible" />
+
+        <!-- Joystick handle with float effect -->
         <Ellipse Name="InnerCircle"
                  Width="60"
                  Height="60"

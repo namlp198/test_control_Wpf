@@ -24,7 +24,7 @@ namespace test_control_WPF
         private bool _isCaptured;
         private double _maxRadius;
 
-        // Dependency Properties cho các tham số có thể cấu hình
+        // Dependency Properties
         public static readonly DependencyProperty NeutralValueProperty =
             DependencyProperty.Register("NeutralValue", typeof(int), typeof(JoystickControl),
                 new PropertyMetadata(130));
@@ -45,14 +45,15 @@ namespace test_control_WPF
             set => SetValue(DeadZoneProperty, value);
         }
 
-        // Giá trị X và Y (0-255)
+        // X, Y (0-255)
         public int XValue { get; private set; }
         public int YValue { get; private set; }
+        public bool IsInDeadZone { get; private set; }
 
-        // Hướng hiện tại (8 hướng + neutral)
+        // Current direction (8 direct + neutral)
         public JoystickDirection CurrentDirection { get; private set; } = JoystickDirection.Neutral;
 
-        // Sự kiện khi giá trị thay đổi
+        // Event
         public event EventHandler<JoystickEventArgs> ValueChanged;
         public event EventHandler<DirectionChangedEventArgs> DirectionChanged;
 
@@ -66,25 +67,50 @@ namespace test_control_WPF
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            _maxRadius = OuterCircle.ActualWidth / 2 - InnerCircle.ActualWidth / 2;
-            _startPos = new Point(OuterCircle.ActualWidth / 2, OuterCircle.ActualHeight / 2);
-            UpdateInnerCirclePosition();
+            this.Dispatcher.InvokeAsync(() =>
+            {
+                _maxRadius = OuterCircle.ActualWidth / 2 - InnerCircle.ActualWidth / 2;
+                _startPos = new Point(OuterCircle.ActualWidth / 2, OuterCircle.ActualHeight / 2);
+                UpdateDeadZoneVisual();
+                UpdateInnerCirclePosition();
+            }, System.Windows.Threading.DispatcherPriority.Loaded); // To make sure Layout calculated ActualWidth
         }
 
         private static void OnDeadZoneChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            //if (d is JoystickControl joystick)
+            //{
+            //    // update UI when deadzone changed
+            //}
             if (d is JoystickControl joystick)
             {
-                // Cập nhật UI khi deadzone thay đổi
+                joystick.UpdateDeadZoneVisual();
             }
         }
+        private void UpdateDeadZoneVisual()
+        {
+            if (_maxRadius <= 0) return;
+
+            double dzRadius = _maxRadius * (DeadZone / 255.0);
+            double size = dzRadius * 2;
+
+            // Make sure it is at least larger than InnerCircle
+            if (size < InnerCircle.Width + 20)
+            {
+                size = InnerCircle.Width + 20;
+            }
+
+            DeadZoneCircle.Width = size;
+            DeadZoneCircle.Height = size;
+        }
+
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
             _isCaptured = true;
             InnerCircle.CaptureMouse();
-            UpdateJoystickPosition(e.GetPosition(this));
+            //UpdateJoystickPosition(e.GetPosition(this));
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -102,7 +128,7 @@ namespace test_control_WPF
             _isCaptured = false;
             InnerCircle.ReleaseMouseCapture();
 
-            // Reset về vị trí trung tâm
+            // Reset back center position
             XValue = NeutralValue;
             YValue = NeutralValue;
             UpdateInnerCirclePosition();
@@ -112,27 +138,46 @@ namespace test_control_WPF
 
         private void UpdateJoystickPosition(Point currentPos)
         {
-            // Tính vector từ tâm đến vị trí hiện tại
+            // Caculate vector from center to current position 
             Vector vector = currentPos - _startPos;
 
-            // Giới hạn trong phạm vi joystick
+            // Limited within joystick range
             if (vector.Length > _maxRadius)
             {
                 vector = vector / vector.Length * _maxRadius;
             }
 
-            // Cập nhật vị trí inner circle
+            // Calculate X and Y value (0-255)
+            double normalizedX = vector.X / _maxRadius;
+            double normalizedY = -vector.Y / _maxRadius; // Reverse Y for down=0, up=255
+
+            double magnitude = Math.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+            IsInDeadZone = magnitude < (DeadZone / 255.0);
+
+            if (IsInDeadZone)
+            {
+                // Alway reset joystick back to center
+                XValue = NeutralValue;
+                YValue = NeutralValue;
+                UpdateInnerCirclePosition();
+
+                if (CurrentDirection != JoystickDirection.Neutral)
+                {
+                    UpdateDirection(JoystickDirection.Neutral);
+                }
+
+                RaiseValueChanged();
+                return;
+            }
+
+            /* Move if outside DeadZone */
+
+            // Update position of inner circle
             InnerCircle.RenderTransform = new TranslateTransform(vector.X, vector.Y);
 
-            // Tính giá trị X và Y (0-255)
-            double normalizedX = vector.X / _maxRadius;
-            double normalizedY = -vector.Y / _maxRadius; // Đảo ngược Y để down=0, up=255
-
-            // Áp dụng dead zone và scaling
             XValue = NormalizeValue(normalizedX);
             YValue = NormalizeValue(normalizedY);
 
-            // Xác định hướng
             var newDirection = CalculateDirection(normalizedX, normalizedY);
             if (newDirection != CurrentDirection)
             {
@@ -148,7 +193,7 @@ namespace test_control_WPF
                 return JoystickDirection.Neutral;
 
             double angle = Math.Atan2(y, x) * (180 / Math.PI);
-            angle = (angle + 360) % 360; // Chuyển về 0-360 độ
+            angle = (angle + 360) % 360; // Convert back 0-360 degree
 
             if (angle >= 337.5 || angle < 22.5) return JoystickDirection.Right;
             if (angle >= 22.5 && angle < 67.5) return JoystickDirection.UpRight;
@@ -163,9 +208,13 @@ namespace test_control_WPF
         private void UpdateDirection(JoystickDirection newDirection)
         {
             CurrentDirection = newDirection;
-            DirectionChanged?.Invoke(this, new DirectionChangedEventArgs(newDirection));
 
-            // Cập nhật UI để highlight hướng đang chọn
+            if (!IsInDeadZone)
+            {
+                DirectionChanged?.Invoke(this, new DirectionChangedEventArgs(newDirection));
+            }
+
+            // Update UI for highlight selecting position
             ResetDirectionIndicators();
 
             switch (newDirection)
@@ -212,25 +261,32 @@ namespace test_control_WPF
 
         private int NormalizeValue(double normalizedValue)
         {
-            double deadZoneNormalized = DeadZone / 255.0;
+            int center = NeutralValue;      // Ex: 130
+            int dz = DeadZone;              // Ex: 40
+            double dzNorm = dz / 255.0;
 
-            if (Math.Abs(normalizedValue) < deadZoneNormalized)
-            {
-                return NeutralValue;
-            }
+            // Inside deadzone → Alway return back to center position
+            if (Math.Abs(normalizedValue) < dzNorm)
+                return center;
 
-            // Scale từ [-1, -deadZone] và [deadZone, 1] đến [0, NeutralValue-DeadZone] và [NeutralValue+DeadZone, 255]
-            if (normalizedValue < 0)
+            if (normalizedValue < 0) // left or down
             {
-                return (int)(NeutralValue + (normalizedValue + deadZoneNormalized) *
-                    ((NeutralValue - DeadZone) / (-1 + deadZoneNormalized)));
+                double factor = (normalizedValue + dzNorm) / (1.0 - dzNorm);  // From 0 to -1
+                double value = center - dz + factor * (center - dz);
+                return Clamp((int)Math.Round(value, MidpointRounding.AwayFromZero), 0, 255);
             }
-            else
+            else // right or up
             {
-                return (int)(NeutralValue + (normalizedValue - deadZoneNormalized) *
-                    ((255 - NeutralValue - DeadZone) / (1 - deadZoneNormalized)));
+                double factor = (normalizedValue - dzNorm) / (1.0 - dzNorm);  // From 0 to 1
+                double value = center + dz + factor * (255 - center - dz);
+                return Clamp((int)Math.Round(value, MidpointRounding.AwayFromZero), 0, 255);
             }
         }
+        private int Clamp(int value, int min, int max)
+        {
+            return Math.Max(min, Math.Min(max, value));
+        }
+
 
         private void UpdateInnerCirclePosition()
         {
